@@ -11,7 +11,7 @@ export type Work = {
   /** immagine Open Access del Met: objectID + parola che deve comparire nel titolo ufficiale */
   met?: { id: number; expect: string }
   /** foto con licenza libera (es. Wikimedia Commons), con attribuzione obbligatoria */
-  photo?: { src: string; credit: string; link: string }
+  photo?: { src: string; credit: string; link: string; license: string; licenseUrl: string }
 }
 
 export type Game =

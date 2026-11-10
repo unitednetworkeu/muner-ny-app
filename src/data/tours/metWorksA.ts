@@ -10,7 +10,9 @@ export const worksA: Record<string, Work[]> = {
       note: { it: 'Stile Beaux-Arts.', en: 'Beaux-Arts style.' },
       photo: {
         src: 'https://commons.wikimedia.org/wiki/Special:FilePath/Metropolitan_Museum_of_Art_(The_Met)_-_Central_Park,_NYC.jpg?width=900',
-        credit: 'Foto: Hugo Schneider · CC BY-SA 2.0 · Wikimedia Commons',
+        credit: 'Foto: Hugo Schneider (Flickr: mvrj300), via Wikimedia Commons',
+        license: 'CC BY-SA 2.0',
+        licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/',
         link: 'https://commons.wikimedia.org/wiki/File:Metropolitan_Museum_of_Art_(The_Met)_-_Central_Park,_NYC.jpg',
       },
       audio: {
