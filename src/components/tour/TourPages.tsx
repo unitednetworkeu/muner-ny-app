@@ -153,6 +153,9 @@ function OfflinePrep({ tour }: { tour: Tour }) {
         ok++
       }
     }
+    for (const w of tour.stops.flatMap((st) => st.works)) {
+      if (w.photo) await new Promise<void>((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = w.photo!.src })
+    }
     setN(ok); setBusy(false)
   }
   return (
@@ -396,6 +399,14 @@ export function TourStop() {
         {stop.works.map((w, i) => (
           <section key={i} className="overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5">
             {w.met && <MetImage id={w.met.id} expect={w.met.expect} alt={t(w.title)} />}
+            {w.photo && (
+              <figure className="-mx-4 -mt-4 mb-3 overflow-hidden rounded-t-2xl bg-slate-900">
+                <img src={w.photo.src} alt={t(w.title)} loading="lazy" className="max-h-80 w-full object-cover" />
+                <figcaption className="px-3 py-1 text-[10px] text-white/60">
+                  <a href={w.photo.link} target="_blank" rel="noreferrer" className="underline">{w.photo.credit}</a>
+                </figcaption>
+              </figure>
+            )}
             <div className="text-xs font-semibold tracking-wide text-un uppercase">🖼️ {t(tx.works)} · {i + 1}/{stop.works.length}</div>
             <h3 className="font-display text-xl font-bold text-navy">{t(w.title)}</h3>
             <div className="text-sm text-slate-600">{w.artist ? `${t(w.artist)} · ` : ''}{w.date}</div>

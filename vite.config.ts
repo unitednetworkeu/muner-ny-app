@@ -42,6 +42,15 @@ export default defineConfig(({ mode }) => ({
                   cacheableResponse: { statuses: [0, 200] },
                 },
               },
+              {
+                urlPattern: /^https:\/\/(commons|upload)\.wikimedia\.org\/.*/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'wikimedia-photos',
+                  expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 180 },
+                  cacheableResponse: { statuses: [0, 200] },
+                },
+              },
             ],
           },
         }),
