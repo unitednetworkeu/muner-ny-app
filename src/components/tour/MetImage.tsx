@@ -16,7 +16,7 @@ export async function loadMetImage(id: number, expect: string): Promise<Info | n
     const j = await r.json()
     const ok = j.isPublicDomain && j.primaryImageSmall && String(j.title).toLowerCase().includes(expect.toLowerCase())
     if (!ok) return null
-    const info = { src: j.primaryImageSmall as string, title: j.title as string, url: j.objectURL as string }
+    const info = { src: j.primaryImageSmall as string, title: String(j.title).replace(/<[^>]+>/g, ''), url: j.objectURL as string }
     try { localStorage.setItem(CK + id, JSON.stringify(info)) } catch { /* ignore */ }
     return info
   } catch {
@@ -37,7 +37,7 @@ export function MetImage({ id, expect, alt }: { id: number; expect: string; alt:
   return (
     <figure className="-mx-4 -mt-4 mb-3 overflow-hidden rounded-t-2xl bg-slate-900">
       <img src={info.src} alt={alt} loading="lazy" className="max-h-80 w-full object-contain" onError={() => setFailed(true)} />
-      <figcaption className="bg-slate-900 px-3 py-1 text-right text-[10px] text-white/60">The Metropolitan Museum of Art · Open Access</figcaption>
+      <figcaption className="bg-slate-900 px-3 py-1 text-[10px] text-white/60">{info.title} · The Met, Open Access</figcaption>
     </figure>
   )
 }
