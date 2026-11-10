@@ -25,8 +25,8 @@ const tx = {
   offlineHint: { it: 'Fallo con il wifi dell’hotel: scarica le immagini delle opere.', en: 'Do it on hotel wifi: downloads the artwork images.' },
   offlineDone: { it: 'Pronto! Immagini salvate:', en: 'Ready! Images saved:' },
   disclaimer: {
-    it: 'App didattica indipendente del progetto MUNER NY, non affiliata né approvata dai musei citati. Immagini delle opere: The Metropolitan Museum of Art, Open Access (pubblico dominio, CC0). Altre foto con licenza indicata in didascalia.',
-    en: 'Independent educational app of the MUNER NY project, not affiliated with or endorsed by the museums mentioned. Artwork images: The Metropolitan Museum of Art, Open Access (public domain, CC0). Other photos licensed as stated in captions.',
+    it: 'App didattica indipendente del progetto MUNER NY, non affiliata né approvata dai musei citati. Immagini delle opere: The Metropolitan Museum of Art, Open Access (pubblico dominio, CC0).',
+    en: 'Independent educational app of the MUNER NY project, not affiliated with or endorsed by the museums mentioned. Artwork images: The Metropolitan Museum of Art, Open Access (public domain, CC0).',
   },
   totalAudio: { it: 'di audioguida in totale', en: 'of audio guide in total' },
   meetTime: { it: 'Ora del ritrovo', en: 'Meeting time' },
