@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { LangProvider, ui, useLang, type Lang } from './i18n'
 import { videos } from './data/videos'
 import { Quiz } from './components/Quiz'
+import { ToursIndex, TourHome, TourStop } from './components/tour/TourPages'
 
 // ---- progresso (solo sul telefono, nessun dato inviato) ----
 const PKEY = 'muner-done'
@@ -212,31 +213,6 @@ function VideoDetail({ mark }: { mark: (id: string) => void }) {
   )
 }
 
-function Tours() {
-  const { t } = useLang()
-  const items = [
-    { e: '🏛️', n: { it: 'Metropolitan Museum of Art', en: 'The Metropolitan Museum of Art' }, d: { it: 'Percorso di 2 ore', en: '2-hour route' } },
-    { e: '🦖', n: { it: 'Museo di Storia Naturale', en: 'American Museum of Natural History' }, d: { it: 'Percorso di 1 ora e 30', en: '1.5-hour route' } },
-    { e: '🏙️', n: { it: 'Empire State Building', en: 'Empire State Building' }, d: { it: 'Dalla lobby all’86° piano', en: 'From the lobby to the 86th floor' } },
-  ]
-  return (
-    <div className="space-y-3 p-4">
-      <h1 className="font-display text-2xl font-bold text-navy">{t(ui.tours)}</h1>
-      <p className="text-sm text-slate-600">{t(ui.toursSoon)}</p>
-      {items.map((i) => (
-        <div key={i.e} className="flex items-center gap-3 rounded-2xl bg-white p-4 opacity-80 ring-1 ring-black/5">
-          <span className="text-3xl">{i.e}</span>
-          <div className="flex-1">
-            <div className="font-bold text-navy">{t(i.n)}</div>
-            <div className="text-sm text-slate-500">{t(i.d)}</div>
-          </div>
-          <span className="rounded-full bg-taxi px-2 py-0.5 text-[11px] font-bold text-navy">{t(ui.comingSoon)}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 function Routed() {
   const { lang } = useLang()
   const { done, mark } = useDone()
@@ -247,7 +223,9 @@ function Routed() {
         <Route path="/" element={<Home done={done} />} />
         <Route path="/video" element={<VideoList done={done} />} />
         <Route path="/video/:id" element={<VideoDetail mark={mark} />} />
-        <Route path="/visite" element={<Tours />} />
+        <Route path="/visite" element={<ToursIndex />} />
+        <Route path="/visite/:tourId" element={<TourHome />} />
+        <Route path="/visite/:tourId/:stopId" element={<TourStop />} />
       </Routes>
     </Shell>
   )
