@@ -6,17 +6,28 @@ import type { Stop, Tour } from '../../data/tours/types'
 import { AudioGuide } from './AudioGuide'
 import { FloorMap } from './FloorMap'
 import { GameView } from './Games'
+import { MetImage, loadMetImage } from './MetImage'
 
 const tx = {
   start: { it: 'Inizia la visita', en: 'Start the tour' },
   restart: { it: 'Ricomincia da capo', en: 'Start over' },
   continue: { it: 'Continua la visita', en: 'Continue the tour' },
   meet: { it: 'Ritrovo', en: 'Meeting' },
+  notes: { it: 'I miei appunti', en: 'My notes' },
+  notesHint: { it: 'Segna qui ora e punto di ritrovo che ti ha dato il tutor: restano solo sul tuo telefono.', en: 'Note the meeting time and place your tutor gave you: they stay on your phone only.' },
+  intro: { it: 'Introduzione alla sala', en: 'Room introduction' },
+  listenWork: { it: 'Ascolta il racconto dell’opera', en: 'Listen to the story of this work' },
+  prev: { it: 'Indietro', en: 'Back' },
+  legendRoute: { it: 'Tappe del percorso', en: 'Route stops' },
+  legendExtra: { it: 'Extra facoltativi', en: 'Optional extras' },
+  legendDone: { it: 'Completata', en: 'Done' },
+  offline: { it: 'Prepara la visita offline', en: 'Get the tour ready offline' },
+  offlineHint: { it: 'Fallo con il wifi dell’hotel: scarica le immagini delle opere.', en: 'Do it on hotel wifi: downloads the artwork images.' },
+  offlineDone: { it: 'Pronto! Immagini salvate:', en: 'Ready! Images saved:' },
+  totalAudio: { it: 'di audioguida in totale', en: 'of audio guide in total' },
   meetTime: { it: 'Ora del ritrovo', en: 'Meeting time' },
   meetPlace: { it: 'Punto di ritrovo', en: 'Meeting point' },
   meetPlaceHint: { it: 'es. scalinata esterna su Fifth Avenue', en: 'e.g. front steps on Fifth Avenue' },
-  tutor: { it: 'Telefono del tutor', en: 'Tutor’s phone' },
-  call: { it: 'Chiama il tutor', en: 'Call your tutor' },
   minsLeft: { it: 'min al ritrovo', en: 'min to meeting' },
   late: { it: 'È ora di andare al punto di ritrovo!', en: 'Time to head to the meeting point!' },
   hurry: { it: 'Mancano meno di 15 minuti: avviati verso il ritrovo.', en: 'Less than 15 minutes left: start heading to the meeting point.' },
@@ -55,7 +66,7 @@ const tx = {
 }
 
 // ---------- stato della visita (solo sul telefono) ----------
-type TourState = { startedAt?: number; done: string[]; meetTime?: string; meetPlace?: string; tutor?: string }
+type TourState = { startedAt?: number; done: string[]; meetTime?: string; meetPlace?: string }
 const key = (id: string) => `muner-tour-${id}`
 function read(id: string): TourState {
   try { return { done: [], ...JSON.parse(localStorage.getItem(key(id)) || '{}') } } catch { return { done: [] } }
@@ -105,11 +116,6 @@ function MeetBanner({ s }: { s: TourState }) {
           {left <= 0 ? t(tx.late) : urgent ? t(tx.hurry) : `${left} ${t(tx.minsLeft)}`}
         </div>
       </div>
-      {s.tutor && (
-        <a href={`tel:${s.tutor.replace(/\s/g, '')}`} className={`rounded-full px-3 py-1.5 text-xs font-bold ${urgent ? 'bg-white text-rose-700' : 'bg-navy text-white'}`}>
-          📞 {s.tutor}
-        </a>
-      )}
     </div>
   )
 }
@@ -121,6 +127,42 @@ function pace(tour: Tour, s: TourState, now: number): number | null {
   let planned = 0
   for (const st of tour.stops) { if (s.done.includes(st.id)) planned += st.minutes }
   return Math.round(planned - elapsed)
+}
+
+function audioMinutes(tour: Tour) {
+  let w = 0
+  for (const st of tour.stops) {
+    w += st.audio.it.split(/\s+/).length
+    for (const wk of st.works) if (wk.audio) w += wk.audio.it.split(/\s+/).length
+  }
+  return Math.round(w / 145)
+}
+
+function OfflinePrep({ tour }: { tour: Tour }) {
+  const { t } = useLang()
+  const [n, setN] = useState<number | null>(null)
+  const [busy, setBusy] = useState(false)
+  const items = tour.stops.concat(tour.extras).flatMap((st) => st.works).filter((w) => w.met)
+  const run = async () => {
+    setBusy(true)
+    let ok = 0
+    for (const w of items) {
+      const info = await loadMetImage(w.met!.id, w.met!.expect)
+      if (info) {
+        await new Promise<void>((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = info.src })
+        ok++
+      }
+    }
+    setN(ok); setBusy(false)
+  }
+  return (
+    <section className="rounded-2xl bg-white p-4 text-center ring-1 ring-black/5">
+      <button onClick={run} disabled={busy} className="w-full rounded-xl bg-un py-3 font-bold text-white disabled:opacity-60">
+        {busy ? '…' : `⬇️ ${t(tx.offline)}`}
+      </button>
+      <p className="mt-1 text-xs text-slate-500">{n === null ? t(tx.offlineHint) : `${t(tx.offlineDone)} ${n}/${items.length}`}</p>
+    </section>
+  )
 }
 
 // ---------- elenco musei ----------
@@ -162,7 +204,7 @@ function StopRow({ tourId, stop, n, done, label }: { tourId: string; stop: Stop;
   const { t } = useLang()
   return (
     <Link to={`/visite/${tourId}/${stop.id}`} className="flex items-center gap-3 rounded-xl bg-white p-3 ring-1 ring-black/5">
-      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${done ? 'bg-emerald-500' : 'bg-navy'}`}>
+      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ${done ? 'bg-emerald-500' : n === '★' ? 'bg-violet-600' : 'bg-navy'}`}>
         {done ? '✓' : n}
       </span>
       <div className="min-w-0 flex-1">
@@ -186,7 +228,7 @@ export function TourHome() {
   const now = useNow()
   if (!tour) return <div className="p-4">404</div>
 
-  const all = [...tour.stops.map((st, i) => ({ stop: st, n: String(i + 1) })), ...tour.extras.map((st) => ({ stop: st, n: '+' }))]
+  const all = [...tour.stops.map((st, i) => ({ stop: st, n: String(i + 1) })), ...tour.extras.map((st) => ({ stop: st, n: '★' }))]
   const onFloor = all.filter((x) => x.stop.floor === floor)
   const nextStop = tour.stops.find((st) => !s.done.includes(st.id)) ?? tour.stops[0]
   const p = pace(tour, s, now)
@@ -208,19 +250,18 @@ export function TourHome() {
         <header>
           <div className="text-3xl">{tour.emoji}</div>
           <h1 className="font-display text-2xl font-bold text-navy">{t(tour.name)}</h1>
-          <div className="text-sm font-semibold text-un">{t(tour.duration)}</div>
+          <div className="text-sm font-semibold text-un">{t(tour.duration)} · 🎧 ~{audioMinutes(tour)} min {t(tx.totalAudio)}</div>
           <p className="mt-2 text-sm leading-relaxed text-slate-600">{t(tour.intro)}</p>
         </header>
 
         <section className="space-y-2 rounded-2xl bg-white p-4 ring-1 ring-black/5">
-          <h2 className="text-sm font-bold tracking-wide text-navy uppercase">⏰ {t(tx.meet)}</h2>
+          <h2 className="text-sm font-bold tracking-wide text-navy uppercase">📝 {t(tx.notes)}</h2>
+          <p className="text-xs text-slate-500">{t(tx.notesHint)}</p>
           <div className="grid grid-cols-[110px_1fr] items-center gap-2 text-sm">
             <label htmlFor="mt">{t(tx.meetTime)}</label>
             <input id="mt" type="time" className={input} value={s.meetTime ?? ''} onChange={(e) => update({ meetTime: e.target.value })} />
             <label htmlFor="mp">{t(tx.meetPlace)}</label>
             <input id="mp" className={input} placeholder={t(tx.meetPlaceHint)} value={s.meetPlace ?? ''} onChange={(e) => update({ meetPlace: e.target.value })} />
-            <label htmlFor="tp">{t(tx.tutor)}</label>
-            <input id="tp" type="tel" className={input} placeholder="+39 …" value={s.tutor ?? ''} onChange={(e) => update({ tutor: e.target.value })} />
           </div>
         </section>
 
@@ -243,14 +284,6 @@ export function TourHome() {
           </p>
         )}
 
-        <form onSubmit={goRoom} className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-          <label htmlFor="room" className="text-sm font-bold tracking-wide text-navy uppercase">🔢 {t(tx.room)}</label>
-          <div className="mt-2 flex gap-2">
-            <input id="room" inputMode="numeric" className={`${input} text-lg`} placeholder="131" value={room} onChange={(e) => setRoom(e.target.value)} />
-            <button className="rounded-lg bg-un px-4 font-bold text-white">{t(tx.go)}</button>
-          </div>
-          <p className={`mt-1 text-xs ${roomErr ? 'text-rose-600' : 'text-slate-500'}`}>{roomErr ? t(tx.notFound) : t(tx.roomHint)}</p>
-        </form>
 
         <section className="space-y-2">
           <div className="flex items-center justify-between">
@@ -264,8 +297,21 @@ export function TourHome() {
             </div>
           </div>
           <FloorMap tour={tour} floor={floor} stops={onFloor} current={nextStop.id} done={s.done} onPick={(id) => nav(`/visite/${tour.id}/${id}`)} />
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600">
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-full bg-navy" /> {t(tx.legendRoute)}</span>
+            <span className="flex items-center gap-1"><span className="text-violet-600">★</span> {t(tx.legendExtra)}</span>
+            <span className="flex items-center gap-1"><span className="inline-block h-3 w-3 rounded-full bg-emerald-500" /> {t(tx.legendDone)}</span>
+          </div>
           <p className="text-xs text-slate-500">{t(tx.schematic)}</p>
         </section>
+        <form onSubmit={goRoom} className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
+          <label htmlFor="room" className="text-sm font-bold tracking-wide text-navy uppercase">🔢 {t(tx.room)}</label>
+          <div className="mt-2 flex gap-2">
+            <input id="room" inputMode="numeric" className={`${input} text-lg`} placeholder="131" value={room} onChange={(e) => setRoom(e.target.value)} />
+            <button className="rounded-lg bg-un px-4 font-bold text-white">{t(tx.go)}</button>
+          </div>
+          <p className={`mt-1 text-xs ${roomErr ? 'text-rose-600' : 'text-slate-500'}`}>{roomErr ? t(tx.notFound) : t(tx.roomHint)}</p>
+        </form>
 
         <section className="space-y-2">
           <h2 className="text-sm font-bold tracking-wide text-navy uppercase">📍 {t(tx.stops)}</h2>
@@ -275,8 +321,10 @@ export function TourHome() {
         <section className={`space-y-2 rounded-2xl p-4 ${ahead ? 'bg-emerald-50 ring-1 ring-emerald-200' : 'bg-slate-100'}`}>
           <h2 className="text-sm font-bold tracking-wide text-navy uppercase">✨ {t(tx.extras)}</h2>
           <p className="text-xs text-slate-600">{ahead ? t(tx.extrasAhead) : t(tx.extrasNormal)}</p>
-          {tour.extras.map((st) => <StopRow key={st.id} tourId={tour.id} stop={st} n="+" done={s.done.includes(st.id)} label={tx.extra} />)}
+          {tour.extras.map((st) => <StopRow key={st.id} tourId={tour.id} stop={st} n="★" done={s.done.includes(st.id)} label={tx.extra} />)}
         </section>
+
+        <OfflinePrep tour={tour} />
 
         {tour.closuresUrl && (
           <a href={tour.closuresUrl} target="_blank" rel="noreferrer" className="block text-center text-sm font-semibold text-un underline">
@@ -343,22 +391,18 @@ export function TourStop() {
           {stop.ifClosed && <p className="mt-2 text-sm text-slate-600"><b>{t(tx.ifClosed)}</b> {t(stop.ifClosed)}</p>}
         </section>
 
-        <AudioGuide text={stop.audio} />
+        <AudioGuide text={stop.audio} label={tx.intro} />
 
-        {stop.works.length > 0 && (
-          <section className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-            <h2 className="mb-2 text-sm font-bold tracking-wide text-navy uppercase">🖼️ {t(tx.works)}</h2>
-            <ul className="space-y-3">
-              {stop.works.map((w, i) => (
-                <li key={i} className="border-l-4 border-taxi pl-3">
-                  <div className="font-semibold text-navy">{t(w.title)}</div>
-                  <div className="text-sm text-slate-600">{w.artist ? `${t(w.artist)} · ` : ''}{w.date}</div>
-                  <div className="text-sm text-slate-500">{t(w.note)}</div>
-                </li>
-              ))}
-            </ul>
+        {stop.works.map((w, i) => (
+          <section key={i} className="overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5">
+            {w.met && <MetImage id={w.met.id} expect={w.met.expect} alt={t(w.title)} />}
+            <div className="text-xs font-semibold tracking-wide text-un uppercase">🖼️ {t(tx.works)} · {i + 1}/{stop.works.length}</div>
+            <h3 className="font-display text-xl font-bold text-navy">{t(w.title)}</h3>
+            <div className="text-sm text-slate-600">{w.artist ? `${t(w.artist)} · ` : ''}{w.date}</div>
+            <div className="mb-3 text-sm text-slate-500">{t(w.note)}</div>
+            {w.audio && <AudioGuide text={w.audio} label={tx.listenWork} light />}
           </section>
-        )}
+        ))}
 
         {stop.games.length > 0 && (
           <div className="space-y-3">
@@ -367,9 +411,16 @@ export function TourStop() {
           </div>
         )}
 
-        <button onClick={complete} className="w-full rounded-2xl bg-taxi py-4 text-lg font-bold text-navy shadow">
-          {isExtra ? `✓ ${t(tx.back)}` : next ? `${t(tx.next)} →` : `🏁 ${t(tx.finish)}`}
-        </button>
+        <div className="flex gap-2">
+          {!isExtra && idx > 0 && (
+            <button onClick={() => nav(`/visite/${tour.id}/${tour.stops[idx - 1].id}`)} className="rounded-2xl bg-white px-5 py-4 font-bold text-navy ring-1 ring-black/10">
+              ← {t(tx.prev)}
+            </button>
+          )}
+          <button onClick={complete} className="flex-1 rounded-2xl bg-taxi py-4 text-lg font-bold text-navy shadow">
+            {isExtra ? `✓ ${t(tx.back)}` : next ? `${t(tx.next)} →` : `🏁 ${t(tx.finish)}`}
+          </button>
+        </div>
         {next && <p className="text-center text-sm text-slate-500">{idx + 2}. {t(next.title)}</p>}
         {!next && !isExtra && s.done.length >= tour.stops.length && <p className="text-center font-semibold text-emerald-700">{t(tx.finished)}</p>}
       </article>

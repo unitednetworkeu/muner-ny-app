@@ -37,6 +37,13 @@ export function FloorMap({
       {stops.map(({ stop, n }) => {
         const isCur = stop.id === current
         const isDone = done.includes(stop.id)
+        if (n === '★') {
+          return (
+            <g key={stop.id} onClick={() => onPick(stop.id)} style={{ cursor: 'pointer' }}>
+              <text x={stop.pin.x} y={stop.pin.y + 16} textAnchor="middle" fontSize="24" fill={isDone ? '#10b981' : '#7c3aed'} stroke="#fff" strokeWidth="1.5" paintOrder="stroke">★</text>
+            </g>
+          )
+        }
         return (
           <g key={stop.id} onClick={() => onPick(stop.id)} style={{ cursor: 'pointer' }}>
             <circle cx={stop.pin.x} cy={stop.pin.y + 8} r={isCur ? 12 : 10}

@@ -16,7 +16,7 @@ const tx = {
  * Audioguida. Se `src` (MP3) è presente usa il file audio;
  * altrimenti usa la sintesi vocale del telefono come voce provvisoria.
  */
-export function AudioGuide({ text, src }: { text: { it: string; en: string }; src?: { it?: string; en?: string } }) {
+export function AudioGuide({ text, src, label, light }: { text: { it: string; en: string }; src?: { it?: string; en?: string }; label?: { it: string; en: string }; light?: boolean }) {
   const { lang, t } = useLang()
   const l = lang ?? 'it'
   const file = src?.[l]
@@ -24,6 +24,17 @@ export function AudioGuide({ text, src }: { text: { it: string; en: string }; sr
   const [showText, setShowText] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window
+  const myId = useRef(Math.random().toString(36))
+
+  // un solo lettore alla volta: quando ne parte un altro, questo si ferma
+  useEffect(() => {
+    const h = (e: Event) => {
+      if ((e as CustomEvent).detail !== myId.current) { audioRef.current?.pause(); setState('idle') }
+    }
+    window.addEventListener('muner-audio', h)
+    return () => window.removeEventListener('muner-audio', h)
+  }, [])
+  const announce = () => window.dispatchEvent(new CustomEvent('muner-audio', { detail: myId.current }))
 
   useEffect(() => () => {
     try { window.speechSynthesis?.cancel() } catch { /* ignore */ }
@@ -31,6 +42,7 @@ export function AudioGuide({ text, src }: { text: { it: string; en: string }; sr
   }, [text, l])
 
   const play = () => {
+    if (state !== 'paused') announce()
     if (file) {
       if (!audioRef.current) {
         audioRef.current = new Audio(file)
@@ -67,27 +79,29 @@ export function AudioGuide({ text, src }: { text: { it: string; en: string }; sr
   }
 
   return (
-    <section className="rounded-2xl bg-navy p-4 text-white">
+    <section className={light ? 'rounded-xl bg-slate-100 p-3 text-navy' : 'rounded-2xl bg-navy p-4 text-white'}>
       <div className="flex items-center gap-3">
         <button
           onClick={state === 'playing' ? pause : play}
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-taxi text-2xl text-navy shadow"
+          className={`flex shrink-0 items-center justify-center rounded-full bg-taxi text-navy shadow ${light ? 'h-11 w-11 text-lg' : 'h-14 w-14 text-2xl'}`}
           aria-label={state === 'playing' ? t(tx.pause) : t(tx.listen)}
         >
           {state === 'playing' ? '❚❚' : '▶'}
         </button>
         <div className="flex-1">
-          <div className="font-semibold">🎧 {state === 'paused' ? t(tx.resume) : t(tx.listen)}</div>
-          {!file && <div className="text-xs text-white/60">{canSpeak ? t(tx.tempVoice) : t(tx.noVoice)}</div>}
+          <div className="font-semibold">🎧 {state === 'paused' ? t(tx.resume) : t(label ?? tx.listen)}</div>
+          <div className={`text-xs ${light ? 'text-slate-500' : 'text-white/60'}`}>
+            ~{Math.max(1, Math.round(text[l].split(/\s+/).length / 145))} min{!file && !light ? ` · ${canSpeak ? t(tx.tempVoice) : t(tx.noVoice)}` : ''}
+          </div>
         </div>
         {state !== 'idle' && (
-          <button onClick={stop} className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold">{t(tx.stop)}</button>
+          <button onClick={stop} className={`rounded-full px-3 py-1.5 text-xs font-semibold ${light ? 'bg-white' : 'bg-white/15'}`}>{t(tx.stop)}</button>
         )}
       </div>
-      <button onClick={() => setShowText((s) => !s)} className="mt-3 text-sm font-semibold text-taxi">
+      <button onClick={() => setShowText((s) => !s)} className={`mt-3 text-sm font-semibold ${light ? 'text-un' : 'text-taxi'}`}>
         {showText ? t(tx.hide) : t(tx.read)} {showText ? '▲' : '▼'}
       </button>
-      {showText && <p className="mt-2 text-[15px] leading-relaxed text-white/90">{text[l]}</p>}
+      {showText && <p className={`mt-2 text-[15px] leading-relaxed ${light ? 'text-slate-700' : 'text-white/90'}`}>{text[l]}</p>}
     </section>
   )
 }

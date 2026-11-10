@@ -1,7 +1,16 @@
 import type { L } from '../../i18n'
 import type { QuizQ } from '../videos'
 
-export type Work = { title: L; artist?: L; date: string; note: L }
+export type Work = {
+  title: L
+  artist?: L
+  date: string
+  note: L
+  /** testo dell'audioguida dedicato a quest'opera */
+  audio?: L
+  /** immagine Open Access del Met: objectID + parola che deve comparire nel titolo ufficiale */
+  met?: { id: number; expect: string }
+}
 
 export type Game =
   | { kind: 'order'; prompt: L; items: { label: L; tag?: string }[] } // items nell'ordine corretto

@@ -31,6 +31,18 @@ export default defineConfig(({ mode }) => ({
           workbox: {
             globPatterns: ['**/*.{js,css,html,svg,png,jpg,webp,mp3,json}'],
             maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
+            // immagini e dati Open Access del Met: salvati sul telefono al primo caricamento
+            runtimeCaching: [
+              {
+                urlPattern: /^https:\/\/(images|collectionapi)\.metmuseum\.org\/.*/i,
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'met-open-access',
+                  expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 180 },
+                  cacheableResponse: { statuses: [0, 200] },
+                },
+              },
+            ],
           },
         }),
   ],
