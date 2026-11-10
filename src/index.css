@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0b2a4a;
+  --color-navy-2: #12406e;
+  --color-un: #009edb;
+  --color-taxi: #f7c948;
+  --color-paper: #f6f3ec;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Georgia", "Times New Roman", serif;
+}
+
+html, body, #root { min-height: 100%; }
+body { background: var(--color-paper); color: #1d2733; -webkit-tap-highlight-color: transparent; }
