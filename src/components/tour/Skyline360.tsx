@@ -3,6 +3,9 @@ import { Link } from 'react-router-dom'
 import { useLang } from '../../i18n'
 import { landmarks, bearingDeg, distanceKm, directionName, type Landmark } from '../../data/skyline'
 import { videos } from '../../data/videos'
+import { skylinePhotos } from '../../data/skylinePhotos'
+import { requestOrientation, useHeading } from './heading'
+import { CameraHunt } from './CameraHunt'
 
 const PX = 14 // pixel per grado
 const W = 360 * PX
@@ -22,7 +25,7 @@ const tx = {
   km: { it: 'km a', en: 'km to the' },
   watch: { it: 'Guarda il video', en: 'Watch the video' },
   close: { it: 'Chiudi', en: 'Close' },
-  schematic: { it: 'Disegno schematico: direzioni reali, altezze in proporzione.', en: 'Schematic drawing: real directions, heights in proportion.' },
+  schematic: { it: 'Disegno provvisorio: direzioni reali, altezze in proporzione. Presto qui la foto reale.', en: 'Temporary drawing: real directions, heights in proportion. Real photo coming soon.' },
 }
 
 type Placed = Landmark & { b: number; d: number; x: number; h: number; w: number }
@@ -130,32 +133,13 @@ export function Skyline360() {
 
   useEffect(() => { if (sel) setTimeout(() => center(sel.b), 30) }, [sel, zoom])
 
-  // bussola del telefono
-  useEffect(() => {
-    if (compass !== 'on') return
-    const h = (e: DeviceOrientationEvent & { webkitCompassHeading?: number }) => {
-      const head = e.webkitCompassHeading ?? (e.absolute && e.alpha != null ? 360 - e.alpha : null)
-      if (head != null) center(head, false)
-    }
-    window.addEventListener('deviceorientationabsolute', h as EventListener, true)
-    window.addEventListener('deviceorientation', h as EventListener, true)
-    return () => {
-      window.removeEventListener('deviceorientationabsolute', h as EventListener, true)
-      window.removeEventListener('deviceorientation', h as EventListener, true)
-    }
-  }, [compass, zoom])
+  // bussola del telefono: la vista segue la direzione in cui punta la fotocamera
+  const live = useHeading(compass === 'on')
+  useEffect(() => { if (live != null) center(live, false) }, [live])
 
   const toggleCompass = async () => {
     if (compass === 'on') { setCompass('off'); return }
-    try {
-      const D = DeviceOrientationEvent as unknown as { requestPermission?: () => Promise<string> }
-      if (typeof D?.requestPermission === 'function') {
-        const r = await D.requestPermission()
-        if (r !== 'granted') { setCompass('no'); return }
-      }
-      if (!('DeviceOrientationEvent' in window)) { setCompass('no'); return }
-      setCompass('on')
-    } catch { setCompass('no') }
+    setCompass((await requestOrientation()) ? 'on' : 'no')
   }
 
   const cardinals = [
@@ -188,6 +172,39 @@ export function Skyline360() {
   )
 
   const video = sel?.video ? videos.find((v) => v.id === sel.video) : undefined
+  const ph = skylinePhotos
+
+  const photoStrip = ph && (
+    <div className="relative" style={{ width: (W + EXTRA) * zoom, height: H * zoom, transition: 'width .35s, height .35s' }}>
+      {[0, W].map((off) => (
+        <div key={off} className="absolute inset-y-0 overflow-hidden" style={{ left: off * zoom, width: (off ? EXTRA : W) * zoom }}>
+          {ph.mode === 'pano'
+            ? [-W, 0, W].map((k) => (
+                <img key={k} src={ph.src} alt="" draggable={false} className="absolute top-0 h-full select-none"
+                  style={{ left: (ph.startBearing * PX + k) * zoom, width: W * zoom, maxWidth: 'none' }} />
+              ))
+            : ph.images.flatMap((im) => [-W, 0, W].map((k) => (
+                <img key={im.src + k} src={im.src} alt="" draggable={false} className="absolute top-0 h-full select-none object-cover"
+                  style={{ left: ((im.center - im.fov / 2) * PX + k) * zoom, width: im.fov * PX * zoom, maxWidth: 'none' }} />
+              )))}
+        </div>
+      ))}
+      {[0, W].flatMap((off) => placed.filter((p) => off === 0 || p.x < EXTRA).map((p) => {
+        const pin = ph.pins?.[p.id]
+        const x = ((p.b + (pin?.dBearing ?? 0)) * PX + off) * zoom
+        const y = (pin?.y ?? ph.horizonY - 0.12) * H * zoom
+        const on = sel?.id === p.id
+        return (
+          <button key={p.id + off} onClick={() => setSel(p)} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: x, top: y }}>
+            <span className={`block h-4 w-4 rounded-full border-2 border-white shadow ${on ? 'bg-taxi' : 'animate-pulse bg-un'}`} />
+            <span className={`absolute top-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-bold shadow ${on ? 'bg-taxi text-navy' : 'bg-white/90 text-navy'}`}>
+              {t(p.name).split(' (')[0]}
+            </span>
+          </button>
+        )
+      }))}
+    </div>
+  )
 
   return (
     <section className="space-y-2 rounded-2xl bg-white p-3 ring-1 ring-black/5">
@@ -205,7 +222,7 @@ export function Skyline360() {
 
       <div className="relative">
         <div ref={scroller} onScroll={onScroll} className="overflow-x-auto overscroll-x-contain rounded-xl" style={{ scrollbarWidth: 'none' }}>
-          <svg width={(W + EXTRA) * zoom} height={H * zoom} viewBox={`0 0 ${W + EXTRA} ${H}`} style={{ display: 'block', transition: 'width .35s, height .35s' }}>
+          {photoStrip || <svg width={(W + EXTRA) * zoom} height={H * zoom} viewBox={`0 0 ${W + EXTRA} ${H}`} style={{ display: 'block', transition: 'width .35s, height .35s' }}>
             <defs>
               <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0" stopColor="#bfe3f7" /><stop offset="1" stopColor="#f4fbff" />
@@ -216,7 +233,7 @@ export function Skyline360() {
             {strip(0, 'a')}
             <g clipPath="url(#extra)">{strip(W, 'b')}</g>
             <clipPath id="extra"><rect x={W} y={0} width={EXTRA} height={H} /></clipPath>
-          </svg>
+          </svg>}
         </div>
         {/* indicatore centrale */}
         <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-taxi/80" />
@@ -224,7 +241,7 @@ export function Skyline360() {
           {Math.round(heading)}° {directionName(heading, l).toUpperCase()}
         </div>
       </div>
-      <p className="px-1 text-[10px] text-slate-400">{t(tx.schematic)}</p>
+      <p className="px-1 text-[10px] text-slate-400">{ph ? ph.credit : t(tx.schematic)}</p>
 
       {sel && (
         <div className="rounded-xl bg-navy p-4 text-white">
@@ -245,6 +262,8 @@ export function Skyline360() {
           )}
         </div>
       )}
+
+      <CameraHunt />
     </section>
   )
 }
