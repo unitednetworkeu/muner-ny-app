@@ -1,6 +1,7 @@
 import { met as metBase } from './met'
 import { amnh as amnhBase } from './amnh'
 import { amnhExtra } from './amnhExtra'
+import { esb } from './esb'
 import { worksA } from './metWorksA'
 import { worksB } from './metWorksB'
 import { worksC } from './metWorksC'
@@ -23,4 +24,4 @@ const amnh: Tour = {
   stops: amnhBase.stops.map((s) => ({ ...s, works: [...s.works, ...(amnhExtra[s.id] ?? [])] })),
 }
 
-export const tours: Tour[] = [met, amnh]
+export const tours: Tour[] = [met, amnh, esb]

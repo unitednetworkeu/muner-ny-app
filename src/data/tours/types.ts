@@ -37,6 +37,8 @@ export type Stop = {
   works: Work[]
   games: Game[]
   ifClosed?: L
+  /** componente interattivo speciale mostrato nella tappa */
+  widget?: 'skyline'
 }
 
 export type Tour = {

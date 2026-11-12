@@ -7,6 +7,7 @@ import { AudioGuide } from './AudioGuide'
 import { FloorMap } from './FloorMap'
 import { GameView } from './Games'
 import { MetImage, loadMetImage } from './MetImage'
+import { Skyline360 } from './Skyline360'
 
 const tx = {
   start: { it: 'Inizia la visita', en: 'Start the tour' },
@@ -181,9 +182,6 @@ function OfflinePrep({ tour }: { tour: Tour }) {
 // ---------- elenco musei ----------
 export function ToursIndex() {
   const { t } = useLang()
-  const soon = [
-    { e: '🏙️', n: { it: 'Empire State Building', en: 'Empire State Building' }, d: { it: 'Dalla lobby all’86° piano', en: 'From the lobby to the 86th floor' } },
-  ]
   return (
     <div className="space-y-3 p-4">
       <h1 className="font-display text-2xl font-bold text-navy">{t({ it: 'Visite guidate', en: 'Guided tours' })}</h1>
@@ -197,16 +195,6 @@ export function ToursIndex() {
           </div>
           <span className="text-navy">→</span>
         </Link>
-      ))}
-      {soon.map((i) => (
-        <div key={i.e} className="flex items-center gap-3 rounded-2xl bg-white p-4 opacity-70 ring-1 ring-black/5">
-          <span className="text-3xl">{i.e}</span>
-          <div className="flex-1">
-            <div className="font-bold text-navy">{t(i.n)}</div>
-            <div className="text-sm text-slate-500">{t(i.d)}</div>
-          </div>
-          <span className="rounded-full bg-taxi px-2 py-0.5 text-[11px] font-bold text-navy">{t(tx.soon)}</span>
-        </div>
       ))}
     </div>
   )
@@ -409,6 +397,8 @@ export function TourStop() {
         </section>
 
         <AudioGuide text={stop.audio} label={tx.intro} />
+
+        {stop.widget === 'skyline' && <Skyline360 />}
 
         {stop.works.map((w, i) => (
           <section key={`${stop.id}-${i}`} className="overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5">
