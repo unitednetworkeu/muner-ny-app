@@ -420,7 +420,7 @@ export const videos: Video[] = [
         q: { it: 'Quanti piani ha?', en: 'How many floors does it have?' },
         options: [{ it: '86', en: '86' }, { it: '102', en: '102' }, { it: '110', en: '110' }],
         answer: 1,
-        why: { it: '102 piani; l’osservatorio principale è all’86°.', en: '102 floors; the main observatory is on the 86th.' },
+        why: { it: '102 piani; la terrazza panoramica è all’86°.', en: '102 floors; the observation deck is on the 86th.' },
       },
       {
         q: { it: 'Qual è oggi il grattacielo più alto di New York?', en: 'What is New York’s tallest skyscraper today?' },

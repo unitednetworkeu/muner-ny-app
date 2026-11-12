@@ -321,11 +321,13 @@ export function TourHome() {
           {tour.stops.map((st, i) => <StopRow key={st.id} tourId={tour.id} stop={st} n={String(i + 1)} done={s.done.includes(st.id)} />)}
         </section>
 
+        {tour.extras.length > 0 && (
         <section className={`space-y-2 rounded-2xl p-4 ${ahead ? 'bg-emerald-50 ring-1 ring-emerald-200' : 'bg-slate-100'}`}>
-          <h2 className="text-sm font-bold tracking-wide text-navy uppercase">✨ {t(tx.extras)}</h2>
-          <p className="text-xs text-slate-600">{ahead ? t(tx.extrasAhead) : t(tx.extrasNormal)}</p>
-          {tour.extras.map((st) => <StopRow key={st.id} tourId={tour.id} stop={st} n="★" done={s.done.includes(st.id)} label={tx.extra} />)}
-        </section>
+            <h2 className="text-sm font-bold tracking-wide text-navy uppercase">✨ {t(tx.extras)}</h2>
+            <p className="text-xs text-slate-600">{ahead ? t(tx.extrasAhead) : t(tx.extrasNormal)}</p>
+            {tour.extras.map((st) => <StopRow key={st.id} tourId={tour.id} stop={st} n="★" done={s.done.includes(st.id)} label={tx.extra} />)}
+          </section>
+        )}
 
         <OfflinePrep tour={tour} />
 

@@ -265,25 +265,5 @@ export const esb: Tour = {
       ],
     },
   ],
-  extras: [
-    {
-      id: 'floor102',
-      galleries: ['102', '102°', '102nd'],
-      floor: '86',
-      pin: { x: 200, y: 95 },
-      minutes: 15,
-      title: { it: 'Il 102° piano (biglietto extra)', en: 'The 102nd floor (extra ticket)' },
-      area: { it: 'Solo con biglietto 86° + 102°', en: 'Only with an 86th + 102nd ticket' },
-      directions: {
-        it: 'Si sale con un ascensore dall’86° piano. Accessibile solo se il vostro biglietto lo include.',
-        en: 'Reached by elevator from the 86th floor. Only accessible if your ticket includes it.',
-      },
-      audio: {
-        it: 'Il 102° piano è un osservatorio al chiuso con grandi vetrate dal pavimento al soffitto, a circa 370 metri d’altezza. È proprio alla base della famosa punta pensata per i dirigibili. Da qui la città si vede ancora più dall’alto, ma attraverso il vetro.',
-        en: 'The 102nd floor is an indoor observatory with floor-to-ceiling windows, about 370 metres up. It sits right at the base of the famous tip designed for airships. From here the city looks even further below, but through glass.',
-      },
-      works: [],
-      games: [],
-    },
-  ],
+  extras: [],
 }
