@@ -6,7 +6,7 @@ export const amnh: Tour = {
   id: 'amnh',
   emoji: '🦖',
   name: { it: 'Museo di Storia Naturale', en: 'American Museum of Natural History' },
-  duration: { it: '1 ora e 30 · 8 tappe', en: '1.5 hours · 8 stops' },
+  duration: { it: '1 ora e 30 · 11 tappe', en: '1.5 hours · 11 stops' },
   intro: {
     it: 'Dai dinosauri alla balenottera azzurra, dai nostri antenati ai meteoriti: 4 miliardi e mezzo di anni in un’ora e mezza. Si entra da Central Park West, si sale subito al 4° piano e si esce dal Gilder Center su Columbus Avenue.',
     en: 'From dinosaurs to the blue whale, from our ancestors to meteorites: four and a half billion years in an hour and a half. Enter from Central Park West, go straight up to the 4th floor and leave through the Gilder Center on Columbus Avenue.',
@@ -41,6 +41,17 @@ export const amnh: Tour = {
         { label: { it: 'Mammiferi asiatici', en: 'Asian Mammals' }, x: 195, y: 170, w: 90, h: 50 },
         { label: { it: 'Popoli dell’Asia', en: 'Asian Peoples' }, x: 60, y: 100, w: 130, h: 65 },
         { label: { it: 'Rose Center (piano alto)', en: 'Rose Center (upper)' }, x: 150, y: 4, w: 130, h: 60 },
+      ],
+    },
+    {
+      id: '3',
+      label: { it: '3° piano', en: '3rd floor' },
+      street: { label: { it: 'Central Park West', en: 'Central Park West' }, side: 'right' },
+      zones: [
+        { label: { it: 'Popoli del Pacifico', en: 'Pacific Peoples' }, x: 60, y: 100, w: 120, h: 65, tone: '#fde68a' },
+        { label: { it: 'Mammiferi africani (balconata)', en: 'African Mammals (upper level)' }, x: 195, y: 100, w: 90, h: 65 },
+        { label: { it: 'Uccelli e rettili', en: 'Birds & Reptiles' }, x: 195, y: 170, w: 155, h: 50 },
+        { label: { it: 'Primati', en: 'Primates' }, x: 60, y: 170, w: 120, h: 50 },
       ],
     },
     {
@@ -89,8 +100,8 @@ export const amnh: Tour = {
           date: '1858–1919',
           note: { it: 'Murales e citazioni nella Rotonda. Memoriale aperto nel 1936.', en: 'Murals and quotations in the Rotunda. Memorial opened in 1936.' },
           audio: {
-            it: 'Theodore Roosevelt fu il ventiseiesimo presidente degli Stati Uniti, dal 1901 al 1909. Ma il legame con questo museo inizia prima: suo padre fu tra i fondatori del museo, e Theodore da ragazzo collezionava animali e scriveva appunti da naturalista. Da presidente protesse enormi territori naturali, creando parchi, riserve e monumenti nazionali: è considerato uno dei padri della conservazione della natura in America. Guardate i murales sulle pareti: raccontano alcuni momenti della sua vita, tra cui la costruzione del Canale di Panama e il trattato di pace che mise fine alla guerra tra Russia e Giappone nel 1905. Per quella mediazione, nel 1906, Roosevelt ricevette il Premio Nobel per la pace: fu il primo americano a vincerlo. Per voi delegati è un esempio interessante di diplomazia: un Paese terzo che aiuta due nemici a trovare un accordo. Ma la sua figura è anche discussa. Per molti anni, davanti a questo ingresso, c’era una statua di Roosevelt a cavallo, con accanto un uomo africano e un nativo americano a piedi, in posizione inferiore. Molti la consideravano un simbolo di gerarchie razziali e coloniali. Dopo un lungo dibattito pubblico, nel 2022 la città di New York ha deciso di rimuoverla. Il museo oggi presenta anche questi aspetti: un modo per ricordare che la storia va raccontata in modo completo, con le sue luci e le sue ombre. Ora prendete gli ascensori e salite al quarto piano: i dinosauri vi aspettano.',
-            en: 'Theodore Roosevelt was the 26th president of the United States, from 1901 to 1909. But his link with this museum started earlier: his father was one of the museum’s founders, and as a boy Theodore collected animals and kept naturalist’s notes. As president he protected vast natural areas, creating parks, reserves and national monuments: he is considered one of the fathers of nature conservation in America. Look at the murals on the walls: they show moments of his life, including the building of the Panama Canal and the peace treaty that ended the war between Russia and Japan in 1905. For that mediation, in 1906, Roosevelt received the Nobel Peace Prize: he was the first American to win it. For you as delegates it is an interesting example of diplomacy: a third country helping two enemies reach an agreement. But he is also a debated figure. For many years, in front of this entrance, stood a statue of Roosevelt on horseback, flanked by an African man and a Native American man on foot, in a lower position. Many saw it as a symbol of racial and colonial hierarchy. After a long public debate, in 2022 the City of New York decided to remove it. Today the museum presents these aspects too: a way of remembering that history must be told in full, with its lights and shadows. Now take the elevators up to the fourth floor: the dinosaurs are waiting.',
+            it: 'Theodore Roosevelt fu il ventiseiesimo presidente degli Stati Uniti, dal 1901 al 1909. Ma il legame con questo museo inizia prima: suo padre fu tra i fondatori del museo, e Theodore da ragazzo collezionava animali e scriveva appunti da naturalista. Da presidente protesse enormi territori naturali, creando parchi, riserve e monumenti nazionali: è considerato uno dei padri della conservazione della natura in America. Guardate i murales sulle pareti: raccontano alcuni momenti della sua vita, tra cui la costruzione del Canale di Panama e il trattato di pace che mise fine alla guerra tra Russia e Giappone nel 1905. Per quella mediazione, nel 1906, Roosevelt ricevette il Premio Nobel per la pace: fu il primo americano a vincerlo. Per voi delegati è un esempio interessante di diplomazia: un Paese terzo che aiuta due nemici a trovare un accordo. Ma la sua figura è anche discussa. Per molti anni, davanti a questo ingresso, c’era una statua di Roosevelt a cavallo, con accanto un uomo africano e un nativo americano a piedi, in posizione inferiore. Molti la consideravano un simbolo di gerarchie razziali e coloniali. Dopo un lungo dibattito pubblico, nel 2022 la città di New York ha deciso di rimuoverla. Il museo oggi presenta anche questi aspetti: un modo per ricordare che la storia va raccontata in modo completo, con le sue luci e le sue ombre. Ora entrate nella sala accanto: vi aspetta l’Africa. I dinosauri arriveranno subito dopo.',
+            en: 'Theodore Roosevelt was the 26th president of the United States, from 1901 to 1909. But his link with this museum started earlier: his father was one of the museum’s founders, and as a boy Theodore collected animals and kept naturalist’s notes. As president he protected vast natural areas, creating parks, reserves and national monuments: he is considered one of the fathers of nature conservation in America. Look at the murals on the walls: they show moments of his life, including the building of the Panama Canal and the peace treaty that ended the war between Russia and Japan in 1905. For that mediation, in 1906, Roosevelt received the Nobel Peace Prize: he was the first American to win it. For you as delegates it is an interesting example of diplomacy: a third country helping two enemies reach an agreement. But he is also a debated figure. For many years, in front of this entrance, stood a statue of Roosevelt on horseback, flanked by an African man and a Native American man on foot, in a lower position. Many saw it as a symbol of racial and colonial hierarchy. After a long public debate, in 2022 the City of New York decided to remove it. Today the museum presents these aspects too: a way of remembering that history must be told in full, with its lights and shadows. Now go into the hall next door: Africa is waiting. The dinosaurs come right after.',
           },
         },
       ],
@@ -186,8 +197,8 @@ export const amnh: Tour = {
       title: { it: 'Il Titanosauro', en: 'The Titanosaur' },
       area: { it: 'Wallach Orientation Center · 4° piano', en: 'Wallach Orientation Center · 4th floor' },
       directions: {
-        it: 'Prendete gli ascensori fino al 4° piano: appena si aprono le porte, la testa del Titanosauro è davanti a voi.',
-        en: 'Take the elevators to the 4th floor: as soon as the doors open, the Titanosaur’s head is right in front of you.',
+        it: 'Dal 3° piano prendete gli ascensori fino al 4°: appena si aprono le porte, la testa del Titanosauro è davanti a voi.',
+        en: 'From the 3rd floor take the elevators up to the 4th: as soon as the doors open, the Titanosaur’s head is right in front of you.',
       },
       audio: {
         it: 'Benvenuti al quarto piano, il regno dei fossili. Questo è il centro di orientamento: da qui partono le sale dedicate all’evoluzione dei vertebrati, dai primi pesci ai dinosauri, fino ai mammiferi. Ma prima, alzate lo sguardo verso il gigante che occupa tutta la sala, e anche un po’ di più.',
@@ -408,8 +419,8 @@ export const amnh: Tour = {
       title: { it: 'Le origini dell’umanità', en: 'Human origins' },
       area: { it: 'Spitzer Hall of Human Origins · 1° piano', en: 'Spitzer Hall of Human Origins · 1st floor' },
       directions: {
-        it: 'Dalla sala della balena seguite le indicazioni “Human Origins”, verso il lato nord del museo.',
-        en: 'From the whale hall follow the “Human Origins” signs towards the north side of the museum.',
+        it: 'Dalla sala della biodiversità seguite le indicazioni “Human Origins”, verso il lato nord del museo.',
+        en: 'From the biodiversity hall follow the “Human Origins” signs towards the north side of the museum.',
       },
       audio: {
         it: 'Questa sala racconta la storia più vicina a noi: la nostra. Come siamo diventati umani? Da dove veniamo? Le risposte arrivano dai fossili e, negli ultimi decenni, dal DNA. Preparatevi a scoprire che, in un certo senso, siamo tutti parenti stretti.',
@@ -528,25 +539,6 @@ export const amnh: Tour = {
       audio: {
         it: 'Il Rose Center, inaugurato nel 2000, è un cubo di vetro che contiene una sfera gigantesca: dentro c’è il planetario. Percorrete la rampa a spirale che gira intorno alla sfera: ogni passo corrisponde a milioni di anni, dal Big Bang a oggi. Alla fine della rampa, tutta la storia dell’umanità occupa uno spazio sottilissimo, quanto lo spessore di un capello. Un modo potente per capire quanto siamo piccoli, e quanto è preziosa la Terra.',
         en: 'The Rose Center, opened in 2000, is a glass cube containing a gigantic sphere: inside is the planetarium. Walk the spiral ramp around the sphere: each step equals millions of years, from the Big Bang to today. At the end of the ramp, the whole history of humanity takes up a sliver as thin as a hair. A powerful way to grasp how small we are, and how precious the Earth is.',
-      },
-      works: [],
-      games: [],
-    },
-    {
-      id: 'biodiversity',
-      galleries: ['biodiversità', 'biodiversity', 'dzanga', 'foresta', 'rainforest'],
-      floor: '1',
-      pin: { x: 312, y: 210 },
-      minutes: 10,
-      title: { it: 'La sala della biodiversità', en: 'The Hall of Biodiversity' },
-      area: { it: 'Hall of Biodiversity · 1° piano', en: 'Hall of Biodiversity · 1st floor' },
-      directions: {
-        it: 'Accanto alla sala della balena, 1° piano.',
-        en: 'Next to the whale hall, 1st floor.',
-      },
-      audio: {
-        it: 'Su una parete lunghissima, la “Spettro della vita”, sono esposti centinaia di organismi, dai batteri ai mammiferi, per mostrare la straordinaria varietà della vita. Di fronte, una ricostruzione della foresta pluviale della Repubblica Centrafricana, con suoni e odori. La sala racconta anche la crisi della biodiversità: oggi molte specie scompaiono a una velocità mai vista. Proteggerle è l’Obiettivo 15 dell’Agenda 2030.',
-        en: 'Along a very long wall, the “Spectrum of Life”, hundreds of organisms are displayed, from bacteria to mammals, to show the extraordinary variety of life. Opposite, a recreation of the rainforest of the Central African Republic, with sounds and smells. The hall also tells the story of the biodiversity crisis: today many species are disappearing at an unprecedented rate. Protecting them is Goal 15 of the 2030 Agenda.',
       },
       works: [],
       games: [],
