@@ -25,7 +25,12 @@ export async function loadMetImage(id: number, expect: string): Promise<Info | n
 }
 
 /** Immagine Open Access del Met. Compare solo se il titolo ufficiale corrisponde all'opera attesa. */
-export function MetImage({ id, expect, alt }: { id: number; expect: string; alt: string }) {
+export function MetImage(props: { id: number; expect: string; alt: string }) {
+  // la chiave forza un riquadro nuovo per ogni opera: niente foto “rimaste” dalla tappa precedente
+  return <MetImageInner key={props.id} {...props} />
+}
+
+function MetImageInner({ id, expect, alt }: { id: number; expect: string; alt: string }) {
   const [info, setInfo] = useState<Info | null>(() => cached(id))
   const [failed, setFailed] = useState(false)
   useEffect(() => {

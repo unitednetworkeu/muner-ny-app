@@ -372,7 +372,7 @@ export function TourStop() {
   return (
     <div>
       <MeetBanner s={s} />
-      <article className="space-y-4 p-4">
+      <article key={stop.id} className="space-y-4 p-4">
         <button onClick={() => nav(`/visite/${tour.id}`)} className="text-sm font-semibold text-un">← {t(tx.back)}</button>
         <header>
           <div className="flex items-center gap-2 text-xs font-semibold tracking-wide text-un uppercase">
@@ -403,7 +403,7 @@ export function TourStop() {
         <AudioGuide text={stop.audio} label={tx.intro} />
 
         {stop.works.map((w, i) => (
-          <section key={i} className="overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5">
+          <section key={`${stop.id}-${i}`} className="overflow-hidden rounded-2xl bg-white p-4 ring-1 ring-black/5">
             {w.met && <MetImage id={w.met.id} expect={w.met.expect} alt={t(w.title)} />}
             {w.photo && (
               <figure className="-mx-4 -mt-4 mb-3 overflow-hidden rounded-t-2xl bg-slate-900">
