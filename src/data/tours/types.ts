@@ -47,6 +47,8 @@ export type Tour = {
   intro: L
   closuresUrl?: string
   entrance: L
+  /** true = le sale non hanno numeri: si cercano per nome */
+  roomSearch?: boolean
   floors: { id: string; label: L; zones: Zone[]; street?: { label: L; side: 'bottom' | 'right' | 'left' | 'top' } }[]
   stops: Stop[]
   extras: Stop[]

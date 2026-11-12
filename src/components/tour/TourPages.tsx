@@ -25,8 +25,12 @@ const tx = {
   offlineHint: { it: 'Fallo con il wifi dell’hotel: scarica le immagini delle opere.', en: 'Do it on hotel wifi: downloads the artwork images.' },
   offlineDone: { it: 'Pronto! Immagini salvate:', en: 'Ready! Images saved:' },
   disclaimer: {
-    it: 'App didattica indipendente del progetto MUNER NY, non affiliata né approvata dai musei citati. Immagini delle opere: The Metropolitan Museum of Art, Open Access (pubblico dominio, CC0).',
-    en: 'Independent educational app of the MUNER NY project, not affiliated with or endorsed by the museums mentioned. Artwork images: The Metropolitan Museum of Art, Open Access (public domain, CC0).',
+    it: 'App didattica indipendente del progetto MUNER NY, non affiliata né approvata dai musei citati.',
+    en: 'Independent educational app of the MUNER NY project, not affiliated with or endorsed by the museums mentioned.',
+  },
+  metImages: {
+    it: 'Immagini delle opere: The Metropolitan Museum of Art, Open Access (pubblico dominio, CC0).',
+    en: 'Artwork images: The Metropolitan Museum of Art, Open Access (public domain, CC0).',
   },
   totalAudio: { it: 'di audioguida in totale', en: 'of audio guide in total' },
   meetTime: { it: 'Ora del ritrovo', en: 'Meeting time' },
@@ -38,6 +42,7 @@ const tx = {
   room: { it: 'In che sala sei?', en: 'Which room are you in?' },
   roomHint: { it: 'Numero sul cartello all’ingresso della sala', en: 'Number on the sign at the room entrance' },
   go: { it: 'Vai', en: 'Go' },
+  roomSearchHint: { it: 'Scrivi il nome della sala o di cosa vedi (es. balena, T. rex, meteoriti)', en: 'Type the hall name or what you see (e.g. whale, T. rex, meteorites)' },
   notFound: { it: 'Nessuna tappa in questa sala. Prova con la piantina.', en: 'No stop in this room. Try the map.' },
   stops: { it: 'Le tappe', en: 'The stops' },
   extras: { it: 'Se hai ancora tempo…', en: 'If you still have time…' },
@@ -162,6 +167,7 @@ function OfflinePrep({ tour }: { tour: Tour }) {
     }
     setN(ok); setBusy(false)
   }
+  if (!items.length) return null
   return (
     <section className="rounded-2xl bg-white p-4 text-center ring-1 ring-black/5">
       <button onClick={run} disabled={busy} className="w-full rounded-xl bg-un py-3 font-bold text-white disabled:opacity-60">
@@ -176,7 +182,6 @@ function OfflinePrep({ tour }: { tour: Tour }) {
 export function ToursIndex() {
   const { t } = useLang()
   const soon = [
-    { e: '🦖', n: { it: 'Museo di Storia Naturale', en: 'American Museum of Natural History' }, d: { it: '1 ora e 30', en: '1.5 hours' } },
     { e: '🏙️', n: { it: 'Empire State Building', en: 'Empire State Building' }, d: { it: 'Dalla lobby all’86° piano', en: 'From the lobby to the 86th floor' } },
   ]
   return (
@@ -229,23 +234,26 @@ export function TourHome() {
   const { t } = useLang()
   const nav = useNavigate()
   const [s, update] = useTourState(tourId)
-  const [floor, setFloor] = useState(tour?.floors[0].id ?? '1')
+  const [floorSel, setFloor] = useState<string | null>(null)
   const [room, setRoom] = useState('')
   const [roomErr, setRoomErr] = useState(false)
   const now = useNow()
   if (!tour) return <div className="p-4">404</div>
 
   const all = [...tour.stops.map((st, i) => ({ stop: st, n: String(i + 1) })), ...tour.extras.map((st) => ({ stop: st, n: '★' }))]
-  const onFloor = all.filter((x) => x.stop.floor === floor)
   const nextStop = tour.stops.find((st) => !s.done.includes(st.id)) ?? tour.stops[0]
+  const floor = floorSel ?? nextStop.floor
+  const onFloor = all.filter((x) => x.stop.floor === floor)
   const p = pace(tour, s, now)
   const routeDone = tour.stops.every((st) => s.done.includes(st.id))
   const ahead = routeDone || (p !== null && p >= 10)
 
   const goRoom = (e: React.FormEvent) => {
     e.preventDefault()
-    const r = room.trim().toLowerCase()
-    const hit = all.find((x) => x.stop.galleries.includes(r))
+    const r = room.trim().toLowerCase().replace(/\s+/g, ' ')
+    const hit = tour.roomSearch
+      ? r.length >= 2 && all.find((x) => x.stop.galleries.some((g) => g.includes(r) || (r.length >= 4 && r.includes(g))))
+      : all.find((x) => x.stop.galleries.includes(r))
     if (hit) { setRoomErr(false); nav(`/visite/${tour.id}/${hit.stop.id}`) } else setRoomErr(true)
   }
 
@@ -314,10 +322,10 @@ export function TourHome() {
         <form onSubmit={goRoom} className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
           <label htmlFor="room" className="text-sm font-bold tracking-wide text-navy uppercase">🔢 {t(tx.room)}</label>
           <div className="mt-2 flex gap-2">
-            <input id="room" inputMode="numeric" className={`${input} text-lg`} placeholder="131" value={room} onChange={(e) => setRoom(e.target.value)} />
+            <input id="room" inputMode={tour.roomSearch ? 'text' : 'numeric'} className={`${input} text-lg`} placeholder={tour.roomSearch ? 'T. rex' : '131'} value={room} onChange={(e) => setRoom(e.target.value)} />
             <button className="rounded-lg bg-un px-4 font-bold text-white">{t(tx.go)}</button>
           </div>
-          <p className={`mt-1 text-xs ${roomErr ? 'text-rose-600' : 'text-slate-500'}`}>{roomErr ? t(tx.notFound) : t(tx.roomHint)}</p>
+          <p className={`mt-1 text-xs ${roomErr ? 'text-rose-600' : 'text-slate-500'}`}>{roomErr ? t(tx.notFound) : t(tour.roomSearch ? tx.roomSearchHint : tx.roomHint)}</p>
         </form>
 
         <section className="space-y-2">
@@ -333,7 +341,7 @@ export function TourHome() {
 
         <OfflinePrep tour={tour} />
 
-        <p className="text-center text-[11px] leading-snug text-slate-400">{t(tx.disclaimer)}</p>
+        <p className="text-center text-[11px] leading-snug text-slate-400">{t(tx.disclaimer)}{tour.id === 'met' ? ` ${t(tx.metImages)}` : ''}</p>
 
         {tour.closuresUrl && (
           <a href={tour.closuresUrl} target="_blank" rel="noreferrer" className="block text-center text-sm font-semibold text-un underline">
