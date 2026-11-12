@@ -4,6 +4,7 @@ import { LangProvider, ui, useLang, type Lang } from './i18n'
 import { videos } from './data/videos'
 import { Quiz } from './components/Quiz'
 import { ToursIndex, TourHome, TourStop } from './components/tour/TourPages'
+import { SvagoHome, SpotDiffGame, PuzzleList, PuzzleGame, CrosswordList, CrosswordGame, BuildingGame, FlagsGame, MapGame } from './components/svago/Svago'
 
 // ---- progresso (solo sul telefono, nessun dato inviato) ----
 const PKEY = 'muner-done'
@@ -58,6 +59,7 @@ function Shell({ children }: { children: ReactNode }) {
           { to: '/', icon: '🏠', label: ui.home },
           { to: '/video', icon: '🎬', label: ui.videos },
           { to: '/visite', icon: '🏛️', label: ui.tours },
+          { to: '/svago', icon: '🎲', label: ui.fun },
         ].map((n) => (
           <NavLink key={n.to} to={n.to} end={n.to === '/'} className={({ isActive }) => `${tab} ${isActive ? 'text-navy' : 'text-slate-400'}`}>
             <span className="text-lg">{n.icon}</span>
@@ -89,7 +91,7 @@ function LangGate() {
 function Home({ done }: { done: string[] }) {
   const { t } = useLang()
   return (
-    <div className="space-y-4 p-4">
+    <div className="flex flex-col gap-4 p-4">
       <section className="rounded-2xl bg-navy-2 p-5 text-white">
         <h1 className="font-display text-2xl font-bold">{t(ui.appTitle)}</h1>
         <p className="mt-2 text-sm leading-relaxed text-white/85">{t(ui.homeWelcome)}</p>
@@ -102,6 +104,11 @@ function Home({ done }: { done: string[] }) {
         <div className="text-3xl">🎬</div>
         <div className="mt-2 text-lg font-bold text-navy">{t(ui.videos)}</div>
         <div className="text-sm text-slate-500">{t(ui.videosCta)}</div>
+      </Link>
+      <Link to="/svago" className="order-last block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+        <div className="text-3xl">🎲</div>
+        <div className="mt-2 text-lg font-bold text-navy">{t(ui.fun)}</div>
+        <div className="text-sm text-slate-500">{t(ui.funCta)}</div>
       </Link>
       <Link to="/visite" className="block rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
         <div className="text-3xl">🏛️</div>
@@ -224,6 +231,15 @@ function Routed() {
         <Route path="/video" element={<VideoList done={done} />} />
         <Route path="/video/:id" element={<VideoDetail mark={mark} />} />
         <Route path="/visite" element={<ToursIndex />} />
+        <Route path="/svago" element={<SvagoHome />} />
+        <Route path="/svago/differenze" element={<SpotDiffGame />} />
+        <Route path="/svago/puzzle" element={<PuzzleList />} />
+        <Route path="/svago/puzzle/:id" element={<PuzzleGame />} />
+        <Route path="/svago/cruciverba" element={<CrosswordList />} />
+        <Route path="/svago/cruciverba/:n" element={<CrosswordGame />} />
+        <Route path="/svago/edifici" element={<BuildingGame />} />
+        <Route path="/svago/bandiere" element={<FlagsGame />} />
+        <Route path="/svago/mappa" element={<MapGame />} />
         <Route path="/visite/:tourId" element={<TourHome />} />
         <Route path="/visite/:tourId/:stopId" element={<TourStop />} />
       </Routes>

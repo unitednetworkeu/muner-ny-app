@@ -37,6 +37,8 @@ export const ui = {
   home: { it: 'Home', en: 'Home' },
   videos: { it: 'Video', en: 'Videos' },
   tours: { it: 'Visite guidate', en: 'Guided tours' },
+  fun: { it: 'Svago', en: 'Fun' },
+  funCta: { it: 'Puzzle, cruciverba, differenze e altri giochi', en: 'Puzzles, crosswords, spot the difference and more' },
   videosIntro: {
     it: 'Nove luoghi, nove storie che non trovi sulle guide. Guarda il video e poi apri la scheda di approfondimento.',
     en: 'Nine places, nine stories you won’t find in guidebooks. Watch the video, then open the in-depth card.',
