@@ -4,6 +4,7 @@ import { useLang, type L } from '../../i18n'
 import { tours } from '../../data/tours'
 import type { Stop, Tour } from '../../data/tours/types'
 import { AudioGuide } from './AudioGuide'
+import { audioSrc } from '../../audio'
 import { FloorMap } from './FloorMap'
 import { GameView } from './Games'
 import { MetImage, loadMetImage } from './MetImage'
@@ -23,8 +24,11 @@ const tx = {
   legendExtra: { it: 'Extra facoltativi', en: 'Optional extras' },
   legendDone: { it: 'Completata', en: 'Done' },
   offline: { it: 'Prepara la visita offline', en: 'Get the tour ready offline' },
-  offlineHint: { it: 'Fallo con il wifi dell’hotel: scarica le immagini delle opere.', en: 'Do it on hotel wifi: downloads the artwork images.' },
-  offlineDone: { it: 'Pronto! Immagini salvate:', en: 'Ready! Images saved:' },
+  offlineHint: { it: 'Fallo con il wifi dell’hotel: scarica l’audioguida nella tua lingua e le immagini delle opere.', en: 'Do it on hotel wifi: downloads the audio guide in your language and the artwork images.' },
+  offlineDone: { it: 'Pronto! Salvati sul telefono:', en: 'Ready! Saved on your phone:' },
+  offlineAudio: { it: 'audio', en: 'audio' },
+  offlineImages: { it: 'immagini', en: 'images' },
+  offlineBusy: { it: 'Download in corso…', en: 'Downloading…' },
   disclaimer: {
     it: 'App didattica indipendente del progetto MUNER NY, non affiliata né approvata dai musei citati.',
     en: 'Independent educational app of the MUNER NY project, not affiliated with or endorsed by the museums mentioned.',
@@ -149,14 +153,24 @@ function audioMinutes(tour: Tour) {
 }
 
 function OfflinePrep({ tour }: { tour: Tour }) {
-  const { t } = useLang()
-  const [n, setN] = useState<number | null>(null)
-  const [busy, setBusy] = useState(false)
+  const { t, lang } = useLang()
+  const l = lang ?? 'it'
+  const [done, setDone] = useState<{ a: number; i: number } | null>(null)
+  const [prog, setProg] = useState<string | null>(null)
   const items = tour.stops.concat(tour.extras).flatMap((st) => st.works).filter((w) => w.met)
+  const audios = tour.stops.concat(tour.extras)
+    .flatMap((st) => [st.audio, ...st.works.map((w) => w.audio)])
+    .map((x) => (x ? audioSrc(x[l], l) : undefined))
+    .filter((x): x is string => !!x)
   const run = async () => {
-    setBusy(true)
+    let a = 0
+    for (const [k, src] of audios.entries()) {
+      setProg(`🎧 ${k + 1}/${audios.length}`)
+      try { const r = await fetch(src); if (r.ok) { await r.arrayBuffer(); a++ } } catch { /* offline */ }
+    }
     let ok = 0
-    for (const w of items) {
+    for (const [k, w] of items.entries()) {
+      setProg(`🖼️ ${k + 1}/${items.length}`)
       const info = await loadMetImage(w.met!.id, w.met!.expect)
       if (info) {
         await new Promise<void>((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = info.src })
@@ -166,15 +180,16 @@ function OfflinePrep({ tour }: { tour: Tour }) {
     for (const w of tour.stops.flatMap((st) => st.works)) {
       if (w.photo) await new Promise<void>((res) => { const im = new Image(); im.onload = im.onerror = () => res(); im.src = w.photo!.src })
     }
-    setN(ok); setBusy(false)
+    setDone({ a, i: ok }); setProg(null)
   }
-  if (!items.length) return null
+  if (!items.length && !audios.length) return null
+  const parts = done && [audios.length ? `${t(tx.offlineAudio)} ${done.a}/${audios.length}` : '', items.length ? `${t(tx.offlineImages)} ${done.i}/${items.length}` : ''].filter(Boolean).join(' · ')
   return (
     <section className="rounded-2xl bg-white p-4 text-center ring-1 ring-black/5">
-      <button onClick={run} disabled={busy} className="w-full rounded-xl bg-un py-3 font-bold text-white disabled:opacity-60">
-        {busy ? '…' : `⬇️ ${t(tx.offline)}`}
+      <button onClick={run} disabled={!!prog} className="w-full rounded-xl bg-un py-3 font-bold text-white disabled:opacity-60">
+        {prog ? `${t(tx.offlineBusy)} ${prog}` : `⬇️ ${t(tx.offline)}`}
       </button>
-      <p className="mt-1 text-xs text-slate-500">{n === null ? t(tx.offlineHint) : `${t(tx.offlineDone)} ${n}/${items.length}`}</p>
+      <p className="mt-1 text-xs text-slate-500">{done ? `${t(tx.offlineDone)} ${parts}` : t(tx.offlineHint)}</p>
     </section>
   )
 }
