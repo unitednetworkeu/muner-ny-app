@@ -111,4 +111,5 @@ export const buildingQuiz: { id: string; name: L; fact: L }[] = [
   { id: 'liberty', name: { it: 'Statua della Libertà', en: 'Statue of Liberty' }, fact: { it: 'Dono della Francia, inaugurata nel 1886.', en: 'A gift from France, dedicated in 1886.' } },
   { id: 'brooklyn', name: { it: 'Ponte di Brooklyn', en: 'Brooklyn Bridge' }, fact: { it: '1883: torri di pietra con archi a sesto acuto.', en: '1883: stone towers with pointed arches.' } },
   { id: 'woolworth', name: { it: 'Woolworth Building', en: 'Woolworth Building' }, fact: { it: 'La “cattedrale del commercio”, il più alto del mondo dal 1913 al 1930.', en: 'The “Cathedral of Commerce”, world’s tallest from 1913 to 1930.' } },
+  { id: 'sanremo', name: { it: 'The San Remo', en: 'The San Remo' }, fact: { it: '1930, architetto Emery Roth: due torri gemelle su Central Park West, coronate da tempietti ispirati a un monumento dell’antica Atene.', en: '1930, architect Emery Roth: twin towers on Central Park West, crowned by small temples inspired by a monument of ancient Athens.' } },
 ]
