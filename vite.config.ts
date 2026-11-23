@@ -31,10 +31,20 @@ export default defineConfig(({ mode }) => ({
           workbox: {
             globPatterns: ['**/*.{js,css,html,svg,png,jpg,webp,json}'],
             // le audioguide non si scaricano all'installazione: solo la lingua scelta, con "Prepara la visita offline"
-            globIgnores: ['audio/**'],
+            globIgnores: ['audio/**', 'video/**'],
             maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
             // immagini e dati Open Access del Met: salvati sul telefono al primo caricamento
             runtimeCaching: [
+              {
+                urlPattern: ({ url }) => url.pathname.startsWith('/video/'),
+                handler: 'CacheFirst',
+                options: {
+                  cacheName: 'muner-video',
+                  rangeRequests: true,
+                  expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 180 },
+                  cacheableResponse: { statuses: [200] },
+                },
+              },
               {
                 urlPattern: ({ url }) => url.pathname.startsWith('/audio/'),
                 handler: 'CacheFirst',

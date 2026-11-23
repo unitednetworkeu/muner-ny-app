@@ -2,6 +2,7 @@ import { HashRouter, Link, NavLink, Route, Routes, useNavigate, useParams } from
 import { useEffect, useState, type ReactNode } from 'react'
 import { LangProvider, ui, useLang, type Lang } from './i18n'
 import { videos } from './data/videos'
+import { videoFile, VIDEO_MB } from './data/videoFiles'
 import { Quiz } from './components/Quiz'
 import { ToursIndex, TourHome, TourStop } from './components/tour/TourPages'
 import { SvagoHome, SpotDiffGame, PuzzleList, PuzzleGame, CrosswordList, CrosswordGame, BuildingGame, FlagsGame, MapGame } from './components/svago/Svago'
@@ -125,11 +126,14 @@ function VideoList({ done }: { done: string[] }) {
     <div className="p-4">
       <h1 className="font-display text-2xl font-bold text-navy">{t(ui.videos)}</h1>
       <p className="mt-1 mb-4 text-sm text-slate-600">{t(ui.videosIntro)}</p>
+      <VideoOffline />
       <ul className="space-y-3">
         {videos.map((v, i) => (
           <li key={v.id}>
             <Link to={`/video/${v.id}`} className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-black/5">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-navy text-3xl">{v.emoji}</div>
+              {videoFile(v.id)
+                ? <img src={videoFile(v.id)!.poster} alt="" loading="lazy" className="h-20 w-[45px] shrink-0 rounded-lg bg-navy object-cover" />
+                : <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-navy text-3xl">{v.emoji}</div>}
               <div className="min-w-0 flex-1">
                 <div className="text-[11px] font-semibold tracking-wide text-un uppercase">{i + 1} · {t(v.borough)}</div>
                 <div className="font-bold text-navy">{t(v.title)}</div>
@@ -141,6 +145,36 @@ function VideoList({ done }: { done: string[] }) {
         ))}
       </ul>
     </div>
+  )
+}
+
+function VideoOffline() {
+  const { t } = useLang()
+  const [prog, setProg] = useState<string | null>(null)
+  const [done, setDone] = useState<number | null>(null)
+  const files = videos.map((v) => videoFile(v.id)).filter((f): f is { src: string; poster: string } => !!f)
+  if (!files.length) return null
+  const run = async () => {
+    let ok = 0
+    for (const [k, f] of files.entries()) {
+      setProg(`${k + 1}/${files.length}`)
+      try {
+        const r = await fetch(f.src)
+        if (r.ok) { await r.arrayBuffer(); ok++ }
+        await fetch(f.poster)
+      } catch { /* offline */ }
+    }
+    setDone(ok); setProg(null)
+  }
+  return (
+    <section className="mb-4 rounded-2xl bg-white p-4 text-center ring-1 ring-black/5">
+      <button onClick={run} disabled={!!prog} className="w-full rounded-xl bg-un py-3 font-bold text-white disabled:opacity-60">
+        {prog ? `${t(ui.videoDl)} ${prog}` : `⬇️ ${t(ui.videoOffline)}`}
+      </button>
+      <p className="mt-1 text-xs text-slate-500">
+        {done === null ? t(ui.videoOfflineHint).replace('{mb}', String(VIDEO_MB)) : `${t(ui.videoOfflineDone)} ${done}/${files.length}`}
+      </p>
+    </section>
   )
 }
 
@@ -163,10 +197,21 @@ function VideoDetail({ mark }: { mark: (id: string) => void }) {
   useEffect(() => { window.scrollTo(0, 0) }, [id])
   if (!v) return <div className="p-4">404</div>
   const next = videos[(idx + 1) % videos.length]
+  const file = videoFile(v.id)
   return (
     <article className="space-y-4 pb-4">
-      <div className="aspect-video w-full bg-black">
-        {v.youtubeId ? (
+      <div className={file ? 'flex w-full justify-center bg-black' : 'aspect-video w-full bg-black'}>
+        {file ? (
+          <video
+            key={v.id}
+            className="aspect-[9/16] max-h-[78vh] w-full max-w-[440px] bg-black object-contain"
+            src={file.src}
+            poster={file.poster}
+            controls
+            playsInline
+            preload="metadata"
+          />
+        ) : v.youtubeId ? (
           <iframe
             className="h-full w-full"
             src={`https://www.youtube-nocookie.com/embed/${v.youtubeId}?rel=0&playsinline=1`}
