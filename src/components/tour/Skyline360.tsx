@@ -4,6 +4,7 @@ import { useLang } from '../../i18n'
 import { landmarks, bearingDeg, distanceKm, directionName, type Landmark } from '../../data/skyline'
 import { videos } from '../../data/videos'
 import { skylinePhotos } from '../../data/skylinePhotos'
+import { streetView } from '../../data/streetview'
 import { requestOrientation, useHeading } from './heading'
 import { CameraHunt } from './CameraHunt'
 
@@ -25,7 +26,13 @@ const tx = {
   km: { it: 'km a', en: 'km to the' },
   watch: { it: 'Guarda il video', en: 'Watch the video' },
   close: { it: 'Chiudi', en: 'Close' },
-  schematic: { it: 'Disegno provvisorio: direzioni reali, altezze in proporzione. Presto qui la foto reale.', en: 'Temporary drawing: real directions, heights in proportion. Real photo coming soon.' },
+  real: { it: '📷 Vista reale', en: '📷 Real view' },
+  drawing: { it: '✏️ Disegno', en: '✏️ Drawing' },
+  loadReal: { it: 'Carica la vista reale', en: 'Load the real view' },
+  loadNote: { it: 'Panoramica a 360° di Google Street View: serve la connessione e si collega ai servizi di Google.', en: '360° panorama from Google Street View: needs a connection and connects to Google services.' },
+  offline: { it: 'Sei offline: ecco il disegno con le direzioni reali.', en: 'You are offline: here is the drawing with the real directions.' },
+  pick: { it: 'Tocca un edificio: la vista ruota verso di lui.', en: 'Tap a building: the view turns towards it.' },
+  schematic: { it: 'Disegno: direzioni reali, altezze in proporzione.', en: 'Drawing: real directions, heights in proportion.' },
 }
 
 type Placed = Landmark & { b: number; d: number; x: number; h: number; w: number }
@@ -109,6 +116,19 @@ export function Skyline360() {
   const [heading, setHeading] = useState(0)
   const [compass, setCompass] = useState<'off' | 'on' | 'no'>('off')
   const zoom = sel ? 1.4 : 1
+  const hasReal = !!streetView.key
+  const [mode, setMode] = useState<'real' | 'drawing'>(hasReal ? 'real' : 'drawing')
+  const [loaded, setLoaded] = useState(false)
+  const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine)
+  const [look, setLook] = useState(15)
+  useEffect(() => {
+    const on = () => setOnline(true), off = () => setOnline(false)
+    window.addEventListener('online', on); window.addEventListener('offline', off)
+    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off) }
+  }, [])
+  const showReal = hasReal && mode === 'real' && online
+  // quando si torna al disegno, riparte guardando l'edificio scelto (o il nord)
+  useEffect(() => { if (!showReal) requestAnimationFrame(() => center(sel ? sel.b : 15, false)) }, [showReal]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const center = (deg: number, smooth = true) => {
     const el = scroller.current
@@ -213,13 +233,51 @@ export function Skyline360() {
           <h2 className="text-sm font-bold tracking-wide text-navy uppercase">🏙️ {t(tx.title)}</h2>
           <p className="text-xs text-slate-500">{t(tx.help)}</p>
         </div>
-        <button onClick={toggleCompass}
+        {!showReal && <button onClick={toggleCompass}
           className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${compass === 'on' ? 'bg-un text-white' : 'bg-slate-100 text-navy'}`}>
           🧭 {compass === 'on' ? t(tx.compassOn) : t(tx.compass)}
-        </button>
+        </button>}
       </div>
       {compass === 'no' && <p className="px-1 text-xs text-rose-600">{t(tx.compassNo)}</p>}
 
+      {hasReal && (
+        <div className="flex gap-1 rounded-full bg-slate-100 p-1 text-xs font-bold">
+          {(['real', 'drawing'] as const).map((m) => (
+            <button key={m} onClick={() => setMode(m)} className={`flex-1 rounded-full py-1.5 ${mode === m ? 'bg-white text-navy shadow' : 'text-slate-500'}`}>{t(tx[m])}</button>
+          ))}
+        </div>
+      )}
+      {hasReal && mode === 'real' && !online && <p className="px-1 text-xs text-rose-600">{t(tx.offline)}</p>}
+
+      {showReal ? (
+        <div className="space-y-2">
+          {loaded ? (
+            <iframe
+              key={look}
+              title="Street View"
+              className="h-72 w-full rounded-xl border-0 bg-slate-200"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              src={`https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${streetView.pano ? `pano=${streetView.pano}` : `location=${streetView.location}`}&heading=${Math.round(look)}&pitch=4&fov=75&language=${l}`}
+            />
+          ) : (
+            <button onClick={() => setLoaded(true)} className="flex h-48 w-full flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-sky-200 to-sky-50 p-4 text-navy">
+              <span className="rounded-full bg-un px-4 py-2 text-sm font-bold text-white">🌐 {t(tx.loadReal)}</span>
+              <span className="max-w-xs text-center text-[11px] text-slate-600">{t(tx.loadNote)}</span>
+            </button>
+          )}
+          <p className="px-1 text-xs text-slate-500">{t(tx.pick)}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {[...placed].sort((a, b) => a.b - b.b).map((p) => (
+              <button key={p.id} onClick={() => { setSel(p); setLook(p.b); setLoaded(true) }}
+                className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${sel?.id === p.id ? 'bg-taxi text-navy' : 'bg-slate-100 text-navy'}`}>
+                {t(p.name).split(' (')[0]} <span className="font-normal text-slate-500">{directionName(p.b, l)}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (<>
       <div className="relative">
         <div ref={scroller} onScroll={onScroll} className="overflow-x-auto overscroll-x-contain rounded-xl" style={{ scrollbarWidth: 'none' }}>
           {photoStrip || <svg width={(W + EXTRA) * zoom} height={H * zoom} viewBox={`0 0 ${W + EXTRA} ${H}`} style={{ display: 'block', transition: 'width .35s, height .35s' }}>
@@ -242,6 +300,7 @@ export function Skyline360() {
         </div>
       </div>
       <p className="px-1 text-[10px] text-slate-400">{ph ? ph.credit : t(tx.schematic)}</p>
+      </>)}
 
       {sel && (
         <div className="rounded-xl bg-navy p-4 text-white">
