@@ -11,8 +11,8 @@
  */
 export const streetView = {
   key: '',
-  pano: 'CIHM0ogKEICAgICUx9Pt-QE', // foto sferica dalla terrazza dell'86° piano scelta da Daniele (23/11/2026)
-  location: '40.7484482,-73.9856457',
+  pano: 'CIHM0ogKEICAgIC40ryskwE', // foto sferica 9728×4864 dalla terrazza dell'86° piano scelta da Daniele (23/11/2026)
+  location: '40.7484405,-73.9856644',
   /** correzione in gradi se la foto sferica non è orientata esattamente sul nord (da verificare sul telefono) */
   headingOffset: 0,
 }
