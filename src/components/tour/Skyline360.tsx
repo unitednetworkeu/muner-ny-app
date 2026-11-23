@@ -259,7 +259,7 @@ export function Skyline360() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               allowFullScreen
-              src={`https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${streetView.pano ? `pano=${streetView.pano}` : `location=${streetView.location}`}&heading=${Math.round(look)}&pitch=4&fov=75&language=${l}`}
+              src={`https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${streetView.pano ? `pano=${streetView.pano}` : `location=${streetView.location}`}&heading=${Math.round((look + streetView.headingOffset + 360) % 360)}&pitch=4&fov=75&language=${l}`}
             />
           ) : (
             <button onClick={() => setLoaded(true)} className="flex h-48 w-full flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-sky-200 to-sky-50 p-4 text-navy">

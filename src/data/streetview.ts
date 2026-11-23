@@ -10,6 +10,8 @@
  */
 export const streetView = {
   key: '',
-  pano: '',
+  pano: 'CIHM0ogKEICAgICUx9Pt-QE', // foto sferica dalla terrazza dell'86° piano scelta da Daniele (23/11/2026)
   location: '40.748440,-73.985664',
+  /** correzione in gradi se la foto sferica non è orientata esattamente sul nord (da verificare sul telefono) */
+  headingOffset: 0,
 }
