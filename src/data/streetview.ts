@@ -6,12 +6,13 @@
  *       (è visibile nel codice della pagina: per questo va limitata al nostro sito).
  * pano: codice della panoramica dell'86° piano (dal link di Google Maps). Se vuoto si usa `location`.
  *
- * Finché `key` è vuota, l'app mostra solo il disegno. Senza connessione si torna sempre al disegno.
+ * Senza `key` si usa l'incorporamento standard di Google Maps ("Condividi → Incorpora una mappa"), che non richiede chiave.
+ * Senza connessione si torna sempre al disegno.
  */
 export const streetView = {
   key: '',
   pano: 'CIHM0ogKEICAgICUx9Pt-QE', // foto sferica dalla terrazza dell'86° piano scelta da Daniele (23/11/2026)
-  location: '40.748440,-73.985664',
+  location: '40.7484482,-73.9856457',
   /** correzione in gradi se la foto sferica non è orientata esattamente sul nord (da verificare sul telefono) */
   headingOffset: 0,
 }

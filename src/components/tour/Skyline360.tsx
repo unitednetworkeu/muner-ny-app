@@ -106,6 +106,17 @@ function Building({ p, sel, onTap }: { p: Placed; sel: boolean; onTap: () => voi
   )
 }
 
+// vista reale: Maps Embed API se c'è la chiave, altrimenti l'incorporamento standard di Google Maps (senza chiave)
+function realSrc(look: number, l: string) {
+  const h = Math.round((look + streetView.headingOffset + 360) % 360)
+  const [lat, lng] = streetView.location.split(',')
+  if (streetView.key) {
+    const where = streetView.pano ? `pano=${streetView.pano}` : `location=${streetView.location}`
+    return `https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${where}&heading=${h}&pitch=4&fov=75&language=${l}`
+  }
+  return `https://www.google.com/maps/embed?pb=!4v1763900000000!6m8!1m7!1s${streetView.pano}!2m2!1d${lat}!2d${lng}!3f${h}!4f4!5f0.4&hl=${l}`
+}
+
 export function Skyline360() {
   const { t, lang } = useLang()
   const l = lang ?? 'it'
@@ -116,7 +127,7 @@ export function Skyline360() {
   const [heading, setHeading] = useState(0)
   const [compass, setCompass] = useState<'off' | 'on' | 'no'>('off')
   const zoom = sel ? 1.4 : 1
-  const hasReal = !!streetView.key
+  const hasReal = !!(streetView.key || streetView.pano)
   const [mode, setMode] = useState<'real' | 'drawing'>(hasReal ? 'real' : 'drawing')
   const [loaded, setLoaded] = useState(false)
   const [online, setOnline] = useState(typeof navigator === 'undefined' ? true : navigator.onLine)
@@ -259,7 +270,7 @@ export function Skyline360() {
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               allowFullScreen
-              src={`https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${streetView.pano ? `pano=${streetView.pano}` : `location=${streetView.location}`}&heading=${Math.round((look + streetView.headingOffset + 360) % 360)}&pitch=4&fov=75&language=${l}`}
+              src={realSrc(look, l)}&heading=${Math.round((look + streetView.headingOffset + 360) % 360)}&pitch=4&fov=75&language=${l}`}
             />
           ) : (
             <button onClick={() => setLoaded(true)} className="flex h-48 w-full flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-sky-200 to-sky-50 p-4 text-navy">
