@@ -58,6 +58,7 @@ export const ui = {
   videoOfflineHint: { it: 'Circa {mb} MB: fallo con il wifi, poco prima del viaggio.', en: 'About {mb} MB: do it on wifi, shortly before the trip.' },
   videoOfflineDone: { it: 'Pronto! Video salvati sul telefono:', en: 'Ready! Videos saved on your phone:' },
   videoDl: { it: 'Download in corso…', en: 'Downloading…' },
+  videoMore: { it: 'Scheda di approfondimento e quiz', en: 'Fact sheet and quiz' },
   videoSoon: { it: 'Il video sarà disponibile a breve', en: 'The video will be available soon' },
   deepDive: { it: 'Approfondimento', en: 'Deep dive' },
   keyDates: { it: 'Date chiave', en: 'Key dates' },

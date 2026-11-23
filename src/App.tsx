@@ -198,18 +198,27 @@ function VideoDetail({ mark }: { mark: (id: string) => void }) {
   if (!v) return <div className="p-4">404</div>
   const next = videos[(idx + 1) % videos.length]
   const file = videoFile(v.id)
+  const goToCard = () => document.getElementById('video-content')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  const onEnded = async () => {
+    // a schermo intero (anche quello nativo di iPhone) prima si esce, poi si scende alla scheda
+    try { if (document.fullscreenElement) await document.exitFullscreen() } catch { /* ignore */ }
+    const el = document.querySelector('video') as (HTMLVideoElement & { webkitExitFullscreen?: () => void }) | null
+    try { el?.webkitExitFullscreen?.() } catch { /* ignore */ }
+    setTimeout(goToCard, 350)
+  }
   return (
     <article className="space-y-4 pb-4">
       <div className={file ? 'flex w-full justify-center bg-black' : 'aspect-video w-full bg-black'}>
         {file ? (
           <video
             key={v.id}
-            className="aspect-[9/16] max-h-[78vh] w-full max-w-[440px] bg-black object-contain"
+            className="aspect-[9/16] max-h-[64vh] w-full max-w-[440px] bg-black object-contain"
             src={file.src}
             poster={file.poster}
             controls
             playsInline
             preload="metadata"
+            onEnded={onEnded}
           />
         ) : v.youtubeId ? (
           <iframe
@@ -226,7 +235,12 @@ function VideoDetail({ mark }: { mark: (id: string) => void }) {
           </div>
         )}
       </div>
-      <div className="space-y-4 px-4">
+      {file && (
+        <button onClick={goToCard} className="-mt-4 flex w-full items-center justify-center gap-2 bg-navy py-2 text-sm font-semibold text-taxi">
+          <span className="animate-bounce">↓</span> {t(ui.videoMore)}
+        </button>
+      )}
+      <div id="video-content" className="scroll-mt-16 space-y-4 px-4">
         <button onClick={() => nav('/video')} className="text-sm font-semibold text-un">← {t(ui.back)}</button>
         <header>
           <div className="text-xs font-semibold tracking-wide text-un uppercase">{t(v.borough)}</div>
