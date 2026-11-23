@@ -12,7 +12,7 @@ const en = list('en')
 writeFileSync(
   'src/data/audioManifest.ts',
   `// Generato da scripts/build-manifest.mjs: elenco degli MP3 presenti in public/audio/<lingua>/
-// Voci: Kokoro (Apache 2.0) – italiano "Nicola" (im_nicola), inglese "Heart" (af_heart)
+// Voci: Kokoro (Apache 2.0) – italiano Google Chirp 3 HD "Orus" (scripts/genera-audio-it-google.py), inglese "Heart" (af_heart)
 export const audioFiles: Record<'it' | 'en', Set<string>> = {
   it: new Set([${fmt(it)}]),
   en: new Set([${fmt(en)}]),
