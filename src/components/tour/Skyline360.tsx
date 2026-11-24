@@ -107,14 +107,24 @@ function Building({ p, sel, onTap }: { p: Placed; sel: boolean; onTap: () => voi
 }
 
 // vista reale: Maps Embed API se c'è la chiave, altrimenti l'incorporamento standard di Google Maps (senza chiave)
-function realSrc(look: number, l: string) {
+function realSrc(look: number, l: string, target?: Placed | null) {
   const h = Math.round((look + streetView.headingOffset + 360) % 360)
+  // inquadratura dell'edificio scelto: inclinazione verso metà altezza, zoom in base alla distanza
+  const DECK = 320 // altezza della terrazza in metri
+  let pitch = -6, zoom = 0.78
+  if (target) {
+    const km = Math.max(target.d, 0.3)
+    const mid = target.height > 0 ? target.height * 0.6 : 0
+    pitch = Math.max(-25, Math.min(6, (Math.atan2(mid - DECK, km * 1000) * 180) / Math.PI))
+    zoom = target.height > 0 ? Math.min(2.6, Math.max(1.1, 0.9 + Math.log2(km + 0.5) * 0.75)) : 1.0
+  }
   const [lat, lng] = streetView.location.split(',')
   if (streetView.key) {
     const where = streetView.pano ? `pano=${streetView.pano}` : `location=${streetView.location}`
-    return `https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${where}&heading=${h}&pitch=4&fov=75&language=${l}`
+    const fov = Math.round(Math.max(20, Math.min(100, 180 / 2 ** zoom)))
+    return `https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${where}&heading=${h}&pitch=${pitch.toFixed(1)}&fov=${fov}&language=${l}`
   }
-  return `https://www.google.com/maps/embed?pb=!4v1763900000000!6m8!1m7!1s${streetView.pano}!2m2!1d${lat}!2d${lng}!3f${h}!4f-6!5f0.78&hl=${l}`
+  return `https://www.google.com/maps/embed?pb=!4v1763900000000!6m8!1m7!1s${streetView.pano}!2m2!1d${lat}!2d${lng}!3f${h}!4f${pitch.toFixed(2)}!5f${zoom.toFixed(2)}&hl=${l}`
 }
 
 export function Skyline360() {
@@ -264,13 +274,13 @@ export function Skyline360() {
         <div className="space-y-2">
           {loaded ? (
             <iframe
-              key={look}
+              key={`${look}-${sel?.id ?? ''}`}
               title="Street View"
               className="h-72 w-full rounded-xl border-0 bg-slate-200"
               loading="lazy"
               referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
-              src={realSrc(look, l)}
+              src={realSrc(look, l, sel)}
             />
           ) : (
             <button onClick={() => setLoaded(true)} className="flex h-48 w-full flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-b from-sky-200 to-sky-50 p-4 text-navy">
