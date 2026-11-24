@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => ({
       ? viteSingleFile()
       : VitePWA({
           registerType: 'autoUpdate',
-          includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
+          includeAssets: ['favicon-64.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-512-maskable.png', 'logo-muner.png', 'logo-muner-large.png'],
           manifest: {
             name: 'MUNER NY – Guida di New York',
             short_name: 'MUNER NY',
@@ -25,7 +25,8 @@ export default defineConfig(({ mode }) => ({
             start_url: '/',
             icons: [
               { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
-              { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+              { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+              { src: 'icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
             ],
           },
           workbox: {

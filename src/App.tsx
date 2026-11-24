@@ -77,8 +77,8 @@ function LangGate() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-8 bg-navy px-6 text-center text-white">
       <div>
-        <div className="font-display text-5xl font-bold">MUNER <span className="text-taxi">NY</span></div>
-        <div className="mt-2 text-white/70">New York · 2027</div>
+        <img src="/logo-muner-large.png" alt="MUNER" width={300} height={176} className="mx-auto w-72 max-w-full drop-shadow-lg" />
+        <div className="mt-4 text-white/70">New York · 2027</div>
       </div>
       <div className="w-full max-w-xs space-y-3">
         <p className="text-sm text-white/70">Scegli la lingua · Choose your language</p>
