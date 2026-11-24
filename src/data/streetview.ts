@@ -14,5 +14,5 @@ export const streetView = {
   pano: 'CAoSF0NJSE0wb2dLRUlDQWdJQzQwcnlza3dF', // foto sferica 9728×4864 dall'86° piano scelta da Daniele (codice da 'Incorpora una mappa', 24/11/2026)
   location: '40.74844053516185,-73.98566440014649',
   /** correzione in gradi se la foto sferica non è orientata esattamente sul nord (da verificare sul telefono) */
-  headingOffset: 0,
+  headingOffset: 257, // Chrysler al centro con 3f=324,7 (Daniele, 24/11) contro un azimut reale di 67,7°
 }
