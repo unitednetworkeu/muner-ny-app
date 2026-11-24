@@ -114,7 +114,7 @@ function realSrc(look: number, l: string) {
     const where = streetView.pano ? `pano=${streetView.pano}` : `location=${streetView.location}`
     return `https://www.google.com/maps/embed/v1/streetview?key=${streetView.key}&${where}&heading=${h}&pitch=4&fov=75&language=${l}`
   }
-  return `https://www.google.com/maps/embed?pb=!4v1763900000000!6m8!1m7!1s${streetView.pano}!2m2!1d${lat}!2d${lng}!3f${h}!4f4!5f0.4&hl=${l}`
+  return `https://www.google.com/maps/embed?pb=!4v1763900000000!6m8!1m7!1s${streetView.pano}!2m2!1d${lat}!2d${lng}!3f${h}!4f-6!5f0.78&hl=${l}`
 }
 
 export function Skyline360() {
@@ -268,7 +268,7 @@ export function Skyline360() {
               title="Street View"
               className="h-72 w-full rounded-xl border-0 bg-slate-200"
               loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
+              referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
               src={realSrc(look, l)}
             />
