@@ -47,9 +47,9 @@ function Shell({ children }: { children: ReactNode }) {
   const tab = 'flex-1 py-2.5 text-center text-xs font-semibold flex flex-col items-center gap-0.5'
   return (
     <div className="mx-auto flex min-h-screen max-w-xl flex-col">
-      <header className="sticky top-0 z-10 flex items-center justify-between bg-navy px-4 py-3 text-white shadow">
-        <Link to="/" className="flex items-baseline gap-2">
-          <span className="font-display text-xl font-bold tracking-tight">MUNER <span className="text-taxi">NY</span></span>
+      <header className="sticky top-0 z-10 flex items-center justify-between bg-navy px-4 py-1.5 text-white shadow">
+        <Link to="/" className="flex items-center gap-3" aria-label="MUNER NY – Home">
+          <img src="/logo-muner.png" alt="MUNER" width={77} height={45} className="h-[45px] w-auto drop-shadow" />
           <span className="hidden text-xs text-white/70 sm:inline">{t(ui.appTitle)}</span>
         </Link>
         <LangSwitch />
